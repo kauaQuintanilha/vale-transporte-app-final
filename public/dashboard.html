@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - Vale Transporte</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 0; }
+  header { background-color: #4CAF50; color: white; padding: 25px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+  main { padding: 30px; max-width: 700px; margin: auto; background-color: #fff; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+  h2 { color: #333; margin-top: 20px; }
+  .balance { font-size: 28px; margin-bottom: 25px; color: #333; }
+  form input, form button { padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; }
+  form button { background-color: #2196F3; color: #fff; border: none; cursor: pointer; font-size: 16px; }
+  form button:hover { background-color: #1976D2; }
+  ul { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; }
+  li { background: #f9f9f9; padding: 12px; margin-bottom: 8px; border-radius: 5px; display: flex; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+  .type { font-weight: bold; }
+  .amount { color: #4CAF50; }
+  .spend { color: #f44336; }
+  #logoutBtn { margin-top: 20px; width: 100%; background-color: #f44336; }
+  #logoutBtn:hover { background-color: #d32f2f; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Vale Transporte</h1>
+</header>
+<main>
+  <div class="balance">Saldo: R$ <span id="balance">0.00</span></div>
+
+  <form id="rechargeForm">
+    <input type="number" id="amount" placeholder="Valor para recarga" step="0.01" required />
+    <button type="submit">Recargar</button>
+  </form>
+
+  <h2>Histórico de transações</h2>
+  <ul id="history"></ul>
+
+  <button id="logoutBtn">Sair</button>
+</main>
+
+<script>
+const token = localStorage.getItem('token');
+if (!token) window.location.href = '/login.html';
+
+async function fetchWallet() {
+  const res = await fetch('/api/wallet', {headers:{Authorization:'Bearer '+token}});
+  const data = await res.json();
+  document.getElementById('balance').innerText = parseFloat(data.balance).toFixed(2);
+}
+
+async function fetchHistory() {
+  const res = await fetch('/api/wallet/history', {headers:{Authorization:'Bearer '+token}});
+  const history = await res.json();
+  const historyUl = document.getElementById('history');
+  historyUl.innerHTML = '';
+  history.forEach(t => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="type">${t.type === 'recharge' ? 'Recarga' : 'Gasto'}</span>
+                    <span class="amount ${t.type==='spend'?'spend':''}">R$ ${parseFloat(t.amount).toFixed(2)}</span>
+                    <span>${new Date(t.created_at).toLocaleString()}</span>`;
+    historyUl.appendChild(li);
+  });
+}
+
+// Atualiza saldo e histórico
+async function updateDashboard() {
+  await fetchWallet();
+  await fetchHistory();
+}
+
+// Polling: atualiza a cada 3 segundos
+setInterval(updateDashboard, 3000);
+
+document.getElementById('rechargeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('amount').value);
+  if (amount <= 0) return alert('Valor inválido');
+  const res = await fetch('/api/wallet/recharge', {
+    method:'POST',
+    headers:{'Content-Type':'application/json', Authorization:'Bearer '+token},
+    body: JSON.stringify({amount})
+  });
+  const data = await res.json();
+  if (data.message) { alert(data.message); updateDashboard(); }
+  else alert(data.error);
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  window.location.href = '/login.html';
+});
+
+// Carrega imediatamente
+updateDashboard();
+</script>
+</body>
+</html>

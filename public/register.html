@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cadastro - Vale Transporte</title>
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+  .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
+  h1 { text-align: center; margin-bottom: 20px; color: #333; }
+  input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+  button { width: 100%; padding: 10px; background: #2196F3; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+  button:hover { background: #1976D2; }
+  p { text-align: center; }
+  a { color: #2196F3; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Cadastro</h1>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Nome" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Senha" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+  <p>Já tem conta? <a href="login.html">Login</a></p>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const res = await fetch('/register', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name,email,password})
+  });
+  const data = await res.json();
+  if (data.message) { alert(data.message); window.location.href='/login.html'; }
+  else alert(data.error);
+});
+</script>
+</body>
+</html>
