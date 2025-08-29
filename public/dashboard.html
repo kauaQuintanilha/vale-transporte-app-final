@@ -4,40 +4,196 @@
 <meta charset="UTF-8">
 <title>Dashboard - Vale Transporte</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 0; }
-  header { background-color: #4CAF50; color: white; padding: 25px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-  main { padding: 30px; max-width: 700px; margin: auto; background-color: #fff; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
-  h2 { color: #333; margin-top: 20px; }
-  .balance { font-size: 28px; margin-bottom: 25px; color: #333; }
-  form input, form button { padding: 11px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; }
-  form button { background-color: #2196F3; color: #fff; border: none; cursor: pointer; font-size: 16px; }
-  form button:hover { background-color: #1976D2; }
-  ul { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; }
-  li { background: #f9f9f9; padding: 12px; margin-bottom: 8px; border-radius: 5px; display: flex; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-  .type { font-weight: bold; }
-  .amount { color: #4CAF50; }
-  .spend { color: #f44336; }
-  #logoutBtn { margin-top: 20px; width: 100%; background-color: #f44336; }
-  #logoutBtn:hover { background-color: #d32f2f; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+
+  main {
+    flex: 1;
+    padding: 35px;
+    max-width: 950px;
+    margin: auto;
+    background-color: #fff;
+    border-radius: 18px;
+    margin-top: 40px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .balance {
+    background: linear-gradient(135deg, #42a5f5, #1565C0);
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  form input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
+  form input:focus {
+    border-color: #1976D2;
+    outline: none;
+    box-shadow: 0 0 8px rgba(25, 118, 210, 0.3);
+  }
+
+  form button {
+    padding: 14px 25px;
+    background: linear-gradient(135deg, #43A047, #2E7D32);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  form button:hover {
+    background: linear-gradient(135deg, #2E7D32, #1B5E20);
+    transform: translateY(-2px);
+  }
+
+  h2 { color: #333; margin-bottom: 15px; font-weight: 600; }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  li {
+    background: #f9f9f9;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    border-left: 5px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  li.recharge { border-left-color: #43A047; }
+  li.spend { border-left-color: #E53935; }
+
+  .spend { color: #E53935; font-weight: bold; }
+  .recharge { color: #43A047; font-weight: bold; }
+
+  #logoutBtn {
+    margin-top: 25px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f44336, #b71c1c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  #logoutBtn:hover {
+    background: linear-gradient(135deg, #d32f2f, #7f0000);
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== NOTIFICAÇÃO PROFISSIONAL ===== */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    font-size: 15px;
+    font-weight: 500;
+    animation: slideIn 0.5s ease, fadeOut 0.5s ease 3.5s forwards;
+    z-index: 9999;
+    color: white;
+  }
+
+  .notification.success { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+  .notification.error   { background: linear-gradient(135deg, #f44336, #b71c1c); }
+  .notification.info    { background: linear-gradient(135deg, #2196F3, #1565C0); }
+
+  .notification i {
+    font-size: 18px;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateX(100px); }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Vale Transporte</h1>
-</header>
+<header>🚍 Vale Transporte</header>
 <main>
-  <div class="balance">Saldo: R$ <span id="balance">0.00</span></div>
+  <div class="balance">Saldo disponível: R$ <span id="balance">0.00</span></div>
 
   <form id="rechargeForm">
-    <input type="number" id="amount" placeholder="Valor para recarga" step="0.01" required />
-    <button type="submit">Recargar</button>
+    <input type="number" id="amount" placeholder="Digite o valor da recarga" step="0.01" required />
+    <button type="submit">💳 Recarregar</button>
   </form>
 
-  <h2>Histórico de transações</h2>
+  <h2>📜 Histórico de transações</h2>
   <ul id="history"></ul>
-  
 
-  <button id="logoutBtn">Sair</button>
+  <button id="logoutBtn">🚪 Sair</button>
 </main>
 
 <script>
@@ -57,42 +213,64 @@ async function fetchHistory() {
   historyUl.innerHTML = '';
   history.forEach(t => {
     const li = document.createElement('li');
-    li.innerHTML = `<span class="type">${t.type === 'recharge' ? 'Recarga' : 'Gasto'}</span>
-                    <span class="amount ${t.type==='spend'?'spend':''}">R$ ${parseFloat(t.amount).toFixed(2)}</span>
-                    <span>${new Date(t.created_at).toLocaleString()}</span>`;
+    li.classList.add(t.type);
+    li.innerHTML = `
+      <span>${t.type === 'recharge' ? 'Recarga' : 'Gasto'}</span>
+      <span class="${t.type==='spend'?'spend':'recharge'}">R$ ${parseFloat(t.amount).toFixed(2)}</span>
+      <span>${new Date(t.created_at).toLocaleString()}</span>`;
     historyUl.appendChild(li);
   });
 }
 
-// Atualiza saldo e histórico
 async function updateDashboard() {
   await fetchWallet();
   await fetchHistory();
 }
 
-// Polling: atualiza a cada 3 segundos
+// Notificação profissional
+function showNotification(type, message) {
+  const notif = document.createElement('div');
+  notif.classList.add('notification', type);
+
+  let icon = "ℹ️";
+  if (type === "success") icon = "✅";
+  if (type === "error") icon = "❌";
+
+  notif.innerHTML = `<i>${icon}</i> <span>${message}</span>`;
+  document.body.appendChild(notif);
+
+  setTimeout(() => { notif.remove(); }, 4000);
+}
+
+// Atualização automática
 setInterval(updateDashboard, 3000);
 
 document.getElementById('rechargeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const amount = parseFloat(document.getElementById('amount').value);
-  if (amount <= 0) return alert('Valor inválido');
+  if (amount <= 0) return showNotification("error", "Valor inválido!");
+
   const res = await fetch('/api/wallet/recharge', {
     method:'POST',
     headers:{'Content-Type':'application/json', Authorization:'Bearer '+token},
     body: JSON.stringify({amount})
   });
+
   const data = await res.json();
-  if (data.message) { alert(data.message); updateDashboard(); }
-  else alert(data.error);
+  if (data.message) {
+    showNotification("success", `Recarga de R$ ${amount.toFixed(2)} realizada com sucesso!`);
+    updateDashboard();
+  } else {
+    showNotification("error", `Erro: ${data.error}`);
+  }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
-  window.location.href = '/login.html';
+  showNotification("info", "Você saiu da conta!");
+  setTimeout(()=> window.location.href = '/login.html', 1500);
 });
 
-// Carrega imediatamente
 updateDashboard();
 </script>
 </body>
