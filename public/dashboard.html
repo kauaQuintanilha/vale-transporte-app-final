@@ -248,12 +248,20 @@ setInterval(updateDashboard, 3000);
 document.getElementById('rechargeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const amount = parseFloat(document.getElementById('amount').value);
-  if (amount <= 0) return showNotification("error", "Valor inválido!");
+  const maxRechargeLimit = 500; // Limite máximo de recarga
+
+  if (amount <= 0) {
+    return showNotification("error", "Valor inválido!");
+  }
+
+  if (amount > maxRechargeLimit) {
+    return showNotification("error", `O valor máximo de recarga é R$ ${maxRechargeLimit.toFixed(2)}.`);
+  }
 
   const res = await fetch('/api/wallet/recharge', {
-    method:'POST',
-    headers:{'Content-Type':'application/json', Authorization:'Bearer '+token},
-    body: JSON.stringify({amount})
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ amount })
   });
 
   const data = await res.json();
@@ -268,7 +276,7 @@ document.getElementById('rechargeForm').addEventListener('submit', async (e) => 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
   showNotification("info", "Você saiu da conta!");
-  setTimeout(()=> window.location.href = '/login.html', 1500);
+  setTimeout(() => window.location.href = '/login.html', 1500);
 });
 
 updateDashboard();
